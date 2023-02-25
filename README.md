@@ -1,3 +1,3 @@
-# Tic Tac Toe in React
+# Tic Tac Toe
 
-Learn how to build the game of tic-tac-toe in React with CSS Grid and the `useReducer` hook.
+Hazme valer carnal
