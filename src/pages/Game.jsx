@@ -1,15 +1,5 @@
 import React from 'react'
-
-export default function App() {
-  return (
-    <div>
-      <header>
-        <h1>Tic Tac Toe in React</h1>
-      </header>
-      <Game />
-    </div>
-  )
-}
+import Grid from '../components/Grid'
 
 const clone = x => JSON.parse(JSON.stringify(x))
 
@@ -76,7 +66,6 @@ const reducer = (state, action) => {
   switch (action.type) {
     case 'RESET':
       return getInitialState()
-
     case 'CLICK': {
       const { x, y } = action.payload
       const { grid, turn } = state
@@ -110,7 +99,7 @@ const reducer = (state, action) => {
   }
 }
 
-function Game() {
+const Game = () => {
   const [state, dispatch] = React.useReducer(
     reducer,
     getInitialState()
@@ -126,22 +115,37 @@ function Game() {
   }
 
   return (
-    <div css={{ display: 'inline-block' }}>
-      <div
-        css={{
-          display: 'flex',
-          justifyContent: 'space-between',
-        }}
-      >
-        <div>Next turn: {turn}</div>
-        <div>
+    <div
+      css={{
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'flex-start',
+        alignItems: 'center',
+        width: '100%',
+        height: '90%',
+        marginTop: '5rem',
+      }}
+    >
+      <div>
+        <p
+          css={{
+            color: '#fff',
+          }}
+        >
           {status === 'success'
-            ? `${turn} won!`
+            ? null
+            : `Siguiente turno: ${turn}`}
+        </p>
+        <p
+          css={{
+            color: '#fff',
+            marginLeft: '2rem',
+          }}
+        >
+          {status === 'success'
+            ? `${turn} gano!`
             : null}
-        </div>
-        <button onClick={reset} type="button">
-          reset
-        </button>
+        </p>
       </div>
       <Grid
         grid={grid}
@@ -151,54 +155,4 @@ function Game() {
   )
 }
 
-function Grid({ grid, handleClick }) {
-  return (
-    <div css={{ display: 'inline-block' }}>
-      <div
-        css={{
-          backgroundColor: '#444',
-          display: 'grid',
-          gridTemplateRows: `repeat(${grid.length}, 1fr)`,
-          gridTemplateColumns: `repeat(${grid[0].length}, 1fr)`,
-          gridGap: 2,
-        }}
-      >
-        {grid.map((row, rowIdx) =>
-          row.map((value, colIdx) => (
-            <Cell
-              key={`${colIdx}-${rowIdx}`}
-              onClick={() => {
-                handleClick(colIdx, rowIdx)
-              }}
-              value={value}
-            />
-          ))
-        )}
-      </div>
-    </div>
-  )
-}
-
-function Cell({ onClick, value }) {
-  return (
-    <div
-      css={{
-        backgroundColor: '#fff',
-        width: 100,
-        height: 100,
-      }}
-    >
-      <button
-        css={{
-          fontSize: '2.5rem',
-          width: '100%',
-          height: '100%',
-        }}
-        onClick={onClick}
-        type="button"
-      >
-        {value}
-      </button>
-    </div>
-  )
-}
+export default Game
