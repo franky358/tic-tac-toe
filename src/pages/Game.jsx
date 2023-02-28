@@ -17,7 +17,6 @@ function checkThree(a, b, c) {
   return a === b && b === c
 }
 
-// ES2019 Array.prototype.flat() could be used instead
 const flatten = arr =>
   arr.reduce((acc, cur) => [...acc, ...cur], [])
 

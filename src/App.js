@@ -1,18 +1,31 @@
 import React from 'react'
-import Lobby from './pages/Lobby'
+import {
+  BrowserRouter as Router,
+  Switch,
+  Route,
+  Link,
+} from 'react-router-dom'
+
 import Game from './pages/Game'
-import './App.css'
+import Home from './pages/Home'
+import Lobby from './pages/Lobby'
 
 export default function App() {
   return (
-    <div className="container">
-      <header>
-        <h1 className="title">
-          Tic Tac Toe en React by Fr4nky Develop3r
-          358
-        </h1>
-      </header>
-      <Game />
-    </div>
+    <Router>
+      <Switch>
+        <Route path="/game">
+          <Game />
+        </Route>
+
+        <Route path="/lobby">
+          <Lobby />
+        </Route>
+
+        <Route path="/">
+          <Home />
+        </Route>
+      </Switch>
+    </Router>
   )
 }

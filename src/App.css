@@ -26,15 +26,44 @@ header {
   color: #00ff41;
 }
 
-.counter-container {
-  height: 90%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+.modalTitle {
+  color: #00ff41;
+  text-align: center;
 }
 
-.counter {
-  color: #00ff41;
-  font-size: 4rem;
+.email-container {
+  display: flex;
+  flex-direction: column;
+  margin-top: 1rem;
+}
+
+.send-button {
+  margin-top: 1rem;
+  background-color: #00ff41;
+  border: none;
+  padding: 8px;
+  border-radius: 10px;
+  color: #000;
+  cursor: pointer;
+}
+
+.email-input {
+  padding: 6px;
+  background-color: #00ff41;
+  color: #000;
+  border: none;
+  border-radius: 4px;
+  font-size: 14px;
   font-weight: bold;
+}
+
+.email-error {
+  color: red;
+  margin-top: 8px;
+}
+
+.lobby-title {
+  color: #00ff41;
+  margin-left: 1rem;
+  margin-top: 1rem;
 }

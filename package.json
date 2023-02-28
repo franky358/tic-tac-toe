@@ -15,7 +15,12 @@
     "@emotion/core": "^10.0.28",
     "parcel-bundler": "^1.12.4",
     "react": "^16.13.1",
-    "react-dom": "^16.13.1"
+    "react-dom": "^16.13.1",
+    "react-modal": "^3.16.1",
+    "react-router-dom": "^5.3.4",
+    "react-spinners": "^0.13.8",
+    "socket.io": "^4.6.1",
+    "socket.io-client": "^4.6.1"
   },
   "devDependencies": {
     "@babel/core": "^7.10.5",
