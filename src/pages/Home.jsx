@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react'
-import { useHistory } from 'react-router-dom'
 import Modal from 'react-modal'
+import { useHistory } from 'react-router-dom'
 import Game from '../pages/Game'
 import io from 'socket.io-client'
 import '../App.css'
+import Lobby from './Lobby'
 
 const modalStyles = {
   content: {
@@ -21,13 +22,13 @@ const modalStyles = {
 
 Modal.setAppElement('#app')
 
-const socket = io()
+const socket = io(
+  'http://ec2-18-188-166-37.us-east-2.compute.amazonaws.com'
+)
 
 export default function Home() {
   const [modalIsOpen, setIsModalOpen] =
     useState(true)
-
-  const history = useHistory()
 
   const [email, setEmail] = useState('')
   const [emailError, setEmailError] = useState('')
@@ -36,13 +37,21 @@ export default function Home() {
     socket.connected
   )
 
+  const history = useHistory()
+
   useEffect(() => {
     socket.on('connect', () => {
+      console.log('connected')
       setIsConnected(true)
+    })
+
+    socket.on('disconnect', () => {
+      setIsConnected(false)
     })
 
     return () => {
       socket.off('connect')
+      socket.off('disconnect')
     }
   }, [])
 
@@ -70,53 +79,56 @@ export default function Home() {
           'Intenta con otro email de favor'
         )
       } else if (response === 'WELCOME') {
-        socket.emit('WANNA_PLAY')
-        history.push('/lobby')
+        history.push({
+          pathname: '/lobby',
+          state: { email },
+        })
       }
     })
   }
 
   return (
-    <div className="container">
-      <header>
-        <Modal
-          isOpen={modalIsOpen}
-          // onAfterOpen={afterOpenModal}
-          // onRequestClose={closeModal}
-          style={modalStyles}
-          contentLabel="Example Modal"
-        >
-          <h3 className="modalTitle">
-            Ingresa tu correo
-          </h3>
-          <form onSubmit={handleStart}>
-            <div className="email-container">
-              <input
-                name="email"
-                type="email"
-                onChange={e => {
-                  setEmail(e.target.value)
-                  setEmailError('')
-                }}
-                className="email-input"
-              />
-              <input
-                type="submit"
-                value="Entrar"
-                className="send-button"
-              />
-              <span className="email-error">
-                {emailError}
-              </span>
-            </div>
-          </form>
-        </Modal>
-        <h1 className="title">
-          Tic Tac Toe en React by Fr4nky Develop3r
-          358
-        </h1>
-      </header>
-      <Game />
-    </div>
+    <>
+      <div className="container">
+        <header>
+          <Modal
+            isOpen={modalIsOpen}
+            // onAfterOpen={afterOpenModal}
+            // onRequestClose={closeModal}
+            style={modalStyles}
+            contentLabel="Example Modal"
+          >
+            <h3 className="modalTitle">
+              Ingresa tu correo
+            </h3>
+            <form onSubmit={handleStart}>
+              <div className="email-container">
+                <input
+                  name="email"
+                  type="email"
+                  onChange={e => {
+                    setEmail(e.target.value)
+                    setEmailError('')
+                  }}
+                  className="email-input"
+                />
+                <input
+                  type="submit"
+                  value="Entrar"
+                  className="send-button"
+                />
+                <span className="email-error">
+                  {emailError}
+                </span>
+              </div>
+            </form>
+          </Modal>
+          <h1 className="title">
+            Tic Tac Toe en React by Brian Dev
+          </h1>
+        </header>
+        <Game />
+      </div>
+    </>
   )
 }
