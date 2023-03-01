@@ -22,7 +22,7 @@ const modalStyles = {
 Modal.setAppElement('#app')
 
 const socket = io(
-  'https://server-tic-tac-toe.herokuapp.com'
+  'http://ec2-18-188-166-37.us-east-2.compute.amazonaws.com'
 )
 
 export default function Home() {

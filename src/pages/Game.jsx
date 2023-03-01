@@ -1,6 +1,7 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import Grid from '../components/Grid'
 import { useLocation } from 'react-router-dom'
+import io from 'socket.io-client'
 
 const clone = x => JSON.parse(JSON.stringify(x))
 
@@ -99,10 +100,12 @@ const reducer = (state, action) => {
   }
 }
 
+const socket = io(
+  'http://ec2-18-188-166-37.us-east-2.compute.amazonaws.com'
+)
+
 const Game = () => {
   const location = useLocation()
-
-  console.log(location.state.gameData)
 
   const [state, dispatch] = React.useReducer(
     reducer,
@@ -113,12 +116,32 @@ const Game = () => {
   const { grid, status, turn } = state
 
   const handleClick = (x, y) => {
+    console.log(x, y)
     dispatch({ type: 'CLICK', payload: { x, y } })
+    socket.emit('TIRADA', { x, y })
   }
 
   const reset = () => {
     dispatch({ type: 'RESET' })
   }
+
+  useEffect(() => {
+    socket.emit(
+      'UPDATE',
+      location.state.gameData.you_are
+    )
+    socket.on('TIRADA_RIVAL', coordinates => {
+      dispatch({
+        type: 'CLICK',
+        payload: {
+          x: coordinates.x,
+          y: coordinates.y,
+        },
+      })
+    })
+  }, [])
+
+  console.log(socket)
 
   return (
     <div
