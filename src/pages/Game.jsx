@@ -1,5 +1,6 @@
 import React from 'react'
 import Grid from '../components/Grid'
+import { useLocation } from 'react-router-dom'
 
 const clone = x => JSON.parse(JSON.stringify(x))
 
@@ -48,10 +49,10 @@ const NEXT_TURN = {
   X: 'O',
 }
 
-const getInitialState = () => ({
+const getInitialState = symbolUser => ({
   grid: newTicTacToeGrid(),
   status: 'inProgress',
-  turn: 'X',
+  turn: symbolUser,
 })
 
 const reducer = (state, action) => {
@@ -99,9 +100,15 @@ const reducer = (state, action) => {
 }
 
 const Game = () => {
+  const location = useLocation()
+
+  console.log(location.state.gameData)
+
   const [state, dispatch] = React.useReducer(
     reducer,
-    getInitialState()
+    getInitialState(
+      location.state.gameData.you_play_with
+    )
   )
   const { grid, status, turn } = state
 

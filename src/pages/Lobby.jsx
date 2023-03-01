@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react'
 import ClipLoader from 'react-spinners/ClipLoader'
-import { useLocation } from 'react-router-dom'
+import {
+  useHistory,
+  useLocation,
+} from 'react-router-dom'
 import io from 'socket.io-client'
 import Game from './Game'
 import Modal from 'react-modal'
@@ -27,13 +30,15 @@ const modalStyles = {
 Modal.setAppElement('#app')
 
 const socket = io(
-  'http://ec2-18-188-166-37.us-east-2.compute.amazonaws.com'
+  'https://server-tic-tac-toe.herokuapp.com'
 )
 
 const Lobby = () => {
   let [loading, setLoading] = useState(true)
 
   const location = useLocation()
+
+  const history = useHistory()
 
   const [gameCallback, setGameCallback] =
     useState()
@@ -89,6 +94,8 @@ const Lobby = () => {
       state: { gameData },
     })
   }
+
+  console.log(gameData)
 
   return (
     <>
