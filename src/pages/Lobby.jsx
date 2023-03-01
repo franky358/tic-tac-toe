@@ -30,7 +30,7 @@ const modalStyles = {
 Modal.setAppElement('#app')
 
 const socket = io(
-  'http://ec2-18-188-166-37.us-east-2.compute.amazonaws.com'
+  'https://server-tic-tac-toe.herokuapp.com'
 )
 
 const Lobby = () => {
