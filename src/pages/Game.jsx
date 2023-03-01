@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import Grid from '../components/Grid'
 import { useLocation } from 'react-router-dom'
 import io from 'socket.io-client'
@@ -115,10 +115,64 @@ const Game = () => {
   )
   const { grid, status, turn } = state
 
+  const [gameData, setGameData] = useState({})
+
+  const [firstTirada, setFirstTirada] =
+    useState(false)
+  const [tiradaRival, setTiradaRival] =
+    useState(false)
+
+  const [message, setMesagge] = useState('')
+
   const handleClick = (x, y) => {
-    console.log(x, y)
-    dispatch({ type: 'CLICK', payload: { x, y } })
-    socket.emit('TIRADA', { x, y })
+    if (
+      gameData.you_play_with === 'X' &&
+      !firstTirada
+    ) {
+      dispatch({
+        type: 'CLICK',
+        payload: { x, y },
+      })
+      socket.emit('TIRADA', { x, y })
+      setFirstTirada(true)
+      setTiradaRival(false)
+      setMesagge(
+        'Es turno de ' + gameData.rival.email
+      )
+      return
+    }
+
+    if (
+      gameData.you_play_with === '0' &&
+      !firstTirada &&
+      tiradaRival
+    ) {
+      dispatch({
+        type: 'CLICK',
+        payload: { x, y },
+      })
+      socket.emit('TIRADA', { x, y })
+      setFirstTirada(true)
+      setTiradaRival(false)
+      setMesagge(
+        'Es turno de ' + gameData.rival.email
+      )
+      return
+    }
+
+    if (tiradaRival) {
+      dispatch({
+        type: 'CLICK',
+        payload: { x, y },
+      })
+      socket.emit('TIRADA', { x, y })
+      setTiradaRival(false)
+      setMesagge(
+        'Es turno de ' + gameData.rival.email
+      )
+
+      return
+    }
   }
 
   const reset = () => {
@@ -130,7 +184,27 @@ const Game = () => {
       'UPDATE',
       location.state.gameData.you_are
     )
+    socket.emit('GET_GAME_DATA', [], response => {
+      if (response.answer === 'OK') {
+        setGameData(response.game)
+        if (response.game.you_play_with === 'X') {
+          setMesagge('Tu turno')
+        } else {
+          setMesagge(
+            'Es turno de ' +
+              response.game.rival.email
+          )
+        }
+      } else {
+        console.log(
+          'hubo un error trayendo la data'
+        )
+      }
+    })
     socket.on('TIRADA_RIVAL', coordinates => {
+      setFirstTirada(true)
+      setTiradaRival(true)
+      setMesagge('Tu turno')
       dispatch({
         type: 'CLICK',
         payload: {
@@ -140,8 +214,6 @@ const Game = () => {
       })
     })
   }, [])
-
-  console.log(socket)
 
   return (
     <div
@@ -161,9 +233,7 @@ const Game = () => {
             color: '#fff',
           }}
         >
-          {status === 'success'
-            ? null
-            : `Siguiente turno: ${turn}`}
+          {status === 'success' ? null : message}
         </p>
         <p
           css={{
@@ -172,7 +242,9 @@ const Game = () => {
           }}
         >
           {status === 'success'
-            ? `${turn} gano!`
+            ? turn === gameData.you_play_with
+              ? `Awesome! Ganaste`
+              : `${gameData.rival.email} ganó`
             : null}
         </p>
       </div>
