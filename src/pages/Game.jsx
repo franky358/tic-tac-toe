@@ -1,6 +1,10 @@
 import React, { useEffect, useState } from 'react'
 import Grid from '../components/Grid'
-import { useLocation } from 'react-router-dom'
+import {
+  useLocation,
+  useHistory,
+} from 'react-router-dom'
+
 import io from 'socket.io-client'
 
 const clone = x => JSON.parse(JSON.stringify(x))
@@ -106,6 +110,7 @@ const socket = io(
 
 const Game = () => {
   const location = useLocation()
+  const history = useHistory()
 
   const [state, dispatch] = React.useReducer(
     reducer,
@@ -123,6 +128,14 @@ const Game = () => {
     useState(false)
 
   const [message, setMesagge] = useState('')
+
+  const [
+    totalParticipants,
+    setTotalParticipants,
+  ] = useState(0)
+  const [leaderBoard, setLeaderBoard] = useState(
+    []
+  )
 
   const handleClick = (x, y) => {
     if (
@@ -213,46 +226,103 @@ const Game = () => {
         },
       })
     })
+
+    socket.emit(
+      'totalParticipants',
+      null,
+      total => {
+        setTotalParticipants(total)
+      }
+    )
+    socket.on('totalParticipants', total => {
+      setTotalParticipants(total)
+    })
+
+    socket.emit('leaderBoard', null, response => {
+      setLeaderBoard(response.leaderBoard)
+    })
+
+    socket.on('leaderBoard', response => {
+      console.log('se actualiza el leaderboard')
+      setLeaderBoard(response.leaderBoard)
+    })
   }, [])
 
+  useEffect(() => {
+    if (status === 'success') {
+      setTimeout(() => {
+        history.push({
+          pathname: '/lobby',
+          state: { email: gameData.you_are },
+        })
+      }, 5000)
+      if (turn === gameData.you_play_with) {
+        let winner = {}
+        let loser = {}
+        if (
+          gameData.you_are ===
+          gameData.player1.email
+        ) {
+          winner = gameData.player1
+          loser = gameData.player2
+        } else {
+          winner = gameData.player2
+          loser = gameData.player1
+        }
+        console.log(winner)
+        console.log(loser)
+        socket.emit('WIN', {
+          winner,
+          loser,
+        })
+      }
+    }
+  }, [status])
+
   return (
-    <div
-      css={{
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'flex-start',
-        alignItems: 'center',
-        width: '100%',
-        height: '90%',
-        marginTop: '5rem',
-      }}
-    >
-      <div>
-        <p
-          css={{
-            color: '#fff',
-          }}
-        >
-          {status === 'success' ? null : message}
-        </p>
-        <p
-          css={{
-            color: '#fff',
-            marginLeft: '2rem',
-          }}
-        >
-          {status === 'success'
-            ? turn === gameData.you_play_with
-              ? `Awesome! Ganaste`
-              : `${gameData.rival.email} ganó`
-            : null}
-        </p>
+    <>
+      <div className="info-container">
+        <span className="online-users">
+          Usuarios en linea: {totalParticipants}
+        </span>
+        <div className="leaderboard-container">
+          <span className="leaderboard-title">
+            Leaderboard
+          </span>
+          <ul className="leaders-list">
+            {leaderBoard.map((user, i) => (
+              <li key={i}>
+                {i + 1}. {user.email} -
+                {` ${user.winStrike}`}
+                {user.winStrike === 1
+                  ? ' victoria'
+                  : ' victorias'}
+              </li>
+            ))}
+          </ul>
+        </div>
       </div>
-      <Grid
-        grid={grid}
-        handleClick={handleClick}
-      />
-    </div>
+      <div className="game-container">
+        <div>
+          <p className="instructions">
+            {status === 'success'
+              ? null
+              : message}
+          </p>
+          <p className="instructions">
+            {status === 'success'
+              ? turn === gameData.you_play_with
+                ? `Awesome! Ganaste`
+                : `${gameData.rival.email} ganó`
+              : null}
+          </p>
+        </div>
+        <Grid
+          grid={grid}
+          handleClick={handleClick}
+        />
+      </div>
+    </>
   )
 }
 
