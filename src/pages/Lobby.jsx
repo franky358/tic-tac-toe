@@ -82,8 +82,9 @@ const Lobby = () => {
       }, 3000)
     })
 
-    socket.emit('WANNA_PLAY')
-
+    setTimeout(() => {
+      socket.emit('WANNA_PLAY')
+    }, 3000)
     return () => {
       socket.off('GAME')
       socket.off('GAME_CANCELLED')
